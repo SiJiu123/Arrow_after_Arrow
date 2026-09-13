@@ -9,6 +9,7 @@
 - 同行或同列的路径阻挡检测
 - 飞出动画、碰撞变色与晃动反馈
 - 支持连续点击，多支箭头可以同时播放飞出动画
+- 碰撞期间移走阻挡物后，可立即重新点击原箭头
 - 每关 3 次失误机会和随时重新开始
 - 3 个固定关卡，全部经过自动求解验证
 
@@ -16,6 +17,8 @@
 
 - Python 3.10 或更高版本
 - pygame-ce 2.5.6
+
+已验证环境：Windows、Python 3.12.14。当前中文字体优先读取 Windows 系统字体；其他系统的中文显示和小屏幕缩放尚未验证。
 
 项目不使用外部图片、音效或商业游戏素材，箭头和界面均由程序绘制。
 
@@ -42,11 +45,15 @@ python app.py
 
 截图存放在 `assets/screenshots/`，包括开始界面、游戏界面和全部通关界面。
 
+这些是程序生成的演示截图；通关与失败示例通过点击处理流程生成，不代表学生人工试玩记录。
+
 ![开始界面](assets/screenshots/start-screen.png)
 
 ![游戏界面](assets/screenshots/game-screen.png)
 
 ![全部通关界面](assets/screenshots/complete-screen.png)
+
+![失败界面](assets/screenshots/failed-screen.png)
 
 ## 测试
 
@@ -55,6 +62,15 @@ python -m unittest discover -s tests -v
 ```
 
 测试覆盖作业要求中的 T01—T06、四方向路径判断、最近阻挡物识别，以及三个关卡的完整求解。
+
+保存带时间戳的测试结果与各关通关坐标：`python scripts/check_project.py`。
+结果见 [测试说明](docs/TEST_REPORT.md) 和 [机器生成证据](docs/evidence/verification.json)。
+
+## 开发与作业材料
+
+- [本轮AIGC优化记录与实测计时](docs/OPTIMIZATION_LOG.md)
+- [博客草稿](docs/BLOG_DRAFT.md)：保留课程链接、学号、个人心得等待本人补充。
+- [作业检查清单](docs/SUBMISSION_CHECKLIST.md)
 
 ## 项目结构
 

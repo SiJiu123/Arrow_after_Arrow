@@ -11,7 +11,7 @@ from pathlib import Path
 import pygame
 
 from game_core import Arrow, Direction, GameState, MoveResult, RoundStatus
-from levels import LEVELS
+from levels import LEVELS, SOLUTIONS
 from theme import PAPER, Theme
 
 
@@ -569,12 +569,28 @@ class ArrowGame:
         paths.append(game_path)
 
         self._start_level(len(LEVELS) - 1)
-        self.game.arrows.clear()
-        self.page = Page.COMPLETE
-        self.draw(0)
+        now = 0
+        for arrow_id in SOLUTIONS[self.game.level.name]:
+            board, cell = self._board_geometry()
+            self._handle_click(self._arrow_center(self.game.arrows[arrow_id], board, cell), now)
+            now += 20
+        self._finish_animations(now + 501)
+        self.draw(now + 501)
         complete_path = output_dir / "complete-screen.png"
         pygame.image.save(self.screen, complete_path)
         paths.append(complete_path)
+
+        self._start_level(0)
+        blocked = next(a for a in self.game.arrows.values()
+                       if self.game.blocker_for(a.id) is not None)
+        for now in (0, 500, 1000):
+            board, cell = self._board_geometry()
+            self._handle_click(self._arrow_center(blocked, board, cell), now)
+            self._finish_animations(now + 431)
+        self.draw(1500)
+        failed_path = output_dir / "failed-screen.png"
+        pygame.image.save(self.screen, failed_path)
+        paths.append(failed_path)
         return paths
 
 
@@ -583,7 +599,7 @@ def main() -> None:
     parser.add_argument(
         "--screenshots",
         type=Path,
-        help="将三个示例界面保存到指定文件夹后退出",
+        help="将开始、游戏、通关和失败示例界面保存到指定文件夹后退出",
     )
     args = parser.parse_args()
     app = ArrowGame()

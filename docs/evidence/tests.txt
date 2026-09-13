@@ -1,0 +1,25 @@
+test_all_handmade_levels_have_a_valid_solution (test_game_core.GameFlowTests.test_all_handmade_levels_have_a_valid_solution) ... ok
+test_t03_edge_arrow_can_leave_without_index_error (test_game_core.GameFlowTests.test_t03_edge_arrow_can_leave_without_index_error) ... ok
+test_t04_clearing_all_arrows_wins (test_game_core.GameFlowTests.test_t04_clearing_all_arrows_wins) ... ok
+test_t05_three_blocked_clicks_lose (test_game_core.GameFlowTests.test_t05_three_blocked_clicks_lose) ... ok
+test_t06_restart_restores_layout_and_mistakes (test_game_core.GameFlowTests.test_t06_restart_restores_layout_and_mistakes) ... ok
+test_all_four_directions (test_game_core.PathDetectionTests.test_all_four_directions) ... ok
+test_nearest_blocker_is_reported (test_game_core.PathDetectionTests.test_nearest_blocker_is_reported) ... ok
+test_t01_unblocked_arrow_is_removed (test_game_core.PathDetectionTests.test_t01_unblocked_arrow_is_removed) ... ok
+test_t02_blocked_arrow_stays_and_costs_one_mistake (test_game_core.PathDetectionTests.test_t02_blocked_arrow_stays_and_costs_one_mistake) ... ok
+test_cycle_is_unsolvable (test_solver.SolverTests.test_cycle_is_unsolvable) ... ok
+test_free_arrow_does_not_hide_remaining_cycle (test_solver.SolverTests.test_free_arrow_does_not_hide_remaining_cycle) ... ok
+test_later_levels_have_more_dependency_layers (test_solver.SolverTests.test_later_levels_have_more_dependency_layers) ... ok
+test_another_arrow_can_be_clicked_while_first_is_flying (test_ui_flow.InterfaceFlowTests.test_another_arrow_can_be_clicked_while_first_is_flying) ... ok
+test_collision_locks_only_that_arrow (test_ui_flow.InterfaceFlowTests.test_collision_locks_only_that_arrow) ... ok
+test_failure_dialog_retry_and_animation_restart (test_ui_flow.InterfaceFlowTests.test_failure_dialog_retry_and_animation_restart) ... ok
+test_full_campaign_via_mouse_coordinates_and_next_buttons (test_ui_flow.InterfaceFlowTests.test_full_campaign_via_mouse_coordinates_and_next_buttons) ... ok
+test_home_button_from_result_page_is_not_overwritten_next_frame (test_ui_flow.InterfaceFlowTests.test_home_button_from_result_page_is_not_overwritten_next_frame) ... ok
+test_last_removal_reaches_complete_page_after_animation (test_ui_flow.InterfaceFlowTests.test_last_removal_reaches_complete_page_after_animation) ... ok
+test_restart_button_restores_removed_arrow (test_ui_flow.InterfaceFlowTests.test_restart_button_restores_removed_arrow) ... ok
+test_start_button_opens_first_level (test_ui_flow.InterfaceFlowTests.test_start_button_opens_first_level) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 3.143s
+
+OK
