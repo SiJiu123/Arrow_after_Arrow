@@ -158,6 +158,8 @@ class ArrowGame:
             self.notice = f"前方有阻挡，剩余 {move.mistakes_remaining} 次机会"
 
     def _finish_animations(self, now: int) -> None:
+        if self.page is not Page.PLAYING:
+            return
         self.animations = [
             animation
             for animation in self.animations

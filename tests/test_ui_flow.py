@@ -7,7 +7,7 @@ os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 import pygame
 
 from app import Animation, ArrowGame, Page
-from game_core import Arrow, Direction, GameState, Level, MoveResult
+from game_core import Arrow, Direction, GameState, Level, MoveResult, RoundStatus
 from levels import LEVELS
 
 
@@ -82,6 +82,24 @@ class InterfaceFlowTests(unittest.TestCase):
 
         self.assertEqual(len(self.app.game.arrows), len(LEVELS[0].arrows))
         self.assertEqual(self.app.game.mistakes_remaining, LEVELS[0].mistakes)
+
+    def test_home_button_from_result_page_is_not_overwritten_next_frame(self):
+        cases = (
+            (Page.LEVEL_WON, RoundStatus.WON),
+            (Page.COMPLETE, RoundStatus.WON),
+            (Page.FAILED, RoundStatus.LOST),
+        )
+        for result_page, round_status in cases:
+            with self.subTest(result_page=result_page):
+                self.app.page = result_page
+                self.app.game.status = round_status
+
+                self.app._handle_click(
+                    self.app._dialog_secondary_button().rect.center, 100
+                )
+                self.app._finish_animations(101)
+
+                self.assertEqual(self.app.page, Page.START)
 
 
 if __name__ == "__main__":
