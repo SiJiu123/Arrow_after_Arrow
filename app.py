@@ -53,7 +53,7 @@ class ArrowGame:
         self.page = Page.START
         self.level_index = 0
         self.game = GameState(LEVELS[0])
-        self.animation: Animation | None = None
+        self.animations: list[Animation] = []
         self.notice = "观察箭头前方，选择没有阻挡的一支"
         self.running = True
         self.mouse_position = (0, 0)
@@ -93,7 +93,7 @@ class ArrowGame:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self._handle_click(event.pos, now)
 
-            self._finish_animation(now)
+            self._finish_animations(now)
             self.draw(now)
             pygame.display.flip()
             self.clock.tick(60)
@@ -111,15 +111,18 @@ class ArrowGame:
                 return
             if self._home_button().contains(position):
                 self.page = Page.START
-                self.animation = None
-                return
-            if self.animation is not None:
+                self.animations.clear()
                 return
             cell = self._cell_at(position)
             if cell is None:
                 return
             arrow = self.game.arrow_at(*cell)
-            if arrow is not None:
+            collision_running = arrow is not None and any(
+                animation.kind is MoveResult.BLOCKED
+                and animation.arrow.id == arrow.id
+                for animation in self.animations
+            )
+            if arrow is not None and not collision_running:
                 self._try_arrow(arrow, now)
             return
 
@@ -146,20 +149,22 @@ class ArrowGame:
     def _try_arrow(self, arrow: Arrow, now: int) -> None:
         move = self.game.click(arrow.id)
         if move.result is MoveResult.REMOVED:
-            self.animation = Animation(MoveResult.REMOVED, arrow, now, 500)
+            self.animations.append(Animation(MoveResult.REMOVED, arrow, now, 500))
             self.notice = "路径畅通，箭头飞出棋盘"
         elif move.result is MoveResult.BLOCKED:
-            self.animation = Animation(
-                MoveResult.BLOCKED, arrow, now, 430, blocker=move.blocker
+            self.animations.append(
+                Animation(MoveResult.BLOCKED, arrow, now, 430, blocker=move.blocker)
             )
             self.notice = f"前方有阻挡，剩余 {move.mistakes_remaining} 次机会"
 
-    def _finish_animation(self, now: int) -> None:
-        if self.animation is None:
+    def _finish_animations(self, now: int) -> None:
+        self.animations = [
+            animation
+            for animation in self.animations
+            if now - animation.started_at < animation.duration
+        ]
+        if self.animations:
             return
-        if now - self.animation.started_at < self.animation.duration:
-            return
-        self.animation = None
         if self.game.status is RoundStatus.WON:
             self.page = (
                 Page.COMPLETE
@@ -173,13 +178,13 @@ class ArrowGame:
         self.level_index = index
         self.game = GameState(LEVELS[index])
         self.page = Page.PLAYING
-        self.animation = None
+        self.animations.clear()
         self.notice = "观察箭头前方，选择没有阻挡的一支"
 
     def _restart_level(self) -> None:
         self.game.reset()
         self.page = Page.PLAYING
-        self.animation = None
+        self.animations.clear()
         self.notice = "本关已重新开始"
 
     def _board_geometry(self) -> tuple[pygame.Rect, int]:
@@ -286,7 +291,10 @@ class ArrowGame:
         self._draw_board(now)
         notice_color = (
             self.theme.danger
-            if self.animation and self.animation.kind is MoveResult.BLOCKED
+            if any(
+                animation.kind is MoveResult.BLOCKED
+                for animation in self.animations
+            )
             else self.theme.muted
         )
         self._draw_text(
@@ -317,7 +325,7 @@ class ArrowGame:
         )
 
         hover_cell = self._cell_at(self.mouse_position)
-        if self.page is Page.PLAYING and self.animation is None and hover_cell:
+        if self.page is Page.PLAYING and hover_cell:
             row, col = hover_cell
             hover_rect = pygame.Rect(
                 board.left + col * cell,
@@ -335,8 +343,10 @@ class ArrowGame:
             pygame.draw.line(self.screen, self.theme.grid_soft, (x, board.top), (x, board.bottom), 1)
         pygame.draw.rect(self.screen, self.theme.grid, board, 2)
 
-        if self.animation and self.animation.blocker:
-            blocker = self.animation.blocker
+        for animation in self.animations:
+            if animation.kind is not MoveResult.BLOCKED or animation.blocker is None:
+                continue
+            blocker = animation.blocker
             blocker_rect = pygame.Rect(
                 board.left + blocker.col * cell + 5,
                 board.top + blocker.row * cell + 5,
@@ -354,18 +364,29 @@ class ArrowGame:
         for arrow in self.game.arrows.values():
             offset = (0.0, 0.0)
             color = self.theme.ink
-            if self.animation and self.animation.arrow.id == arrow.id:
-                offset, color = self._collision_style(now, self.animation)
+            collision = next(
+                (
+                    animation
+                    for animation in self.animations
+                    if animation.kind is MoveResult.BLOCKED
+                    and animation.arrow.id == arrow.id
+                ),
+                None,
+            )
+            if collision is not None:
+                offset, color = self._collision_style(now, collision)
             center = self._arrow_center(arrow, board, cell, offset)
             self._draw_arrow(center, arrow.direction, cell * 0.52, color, max(4, cell // 15))
 
-        if self.animation and self.animation.kind is MoveResult.REMOVED:
-            progress = min(1.0, (now - self.animation.started_at) / self.animation.duration)
-            offset = self._flight_offset(self.animation.arrow, board, cell, progress)
-            center = self._arrow_center(self.animation.arrow, board, cell, offset)
+        for animation in self.animations:
+            if animation.kind is not MoveResult.REMOVED:
+                continue
+            progress = min(1.0, (now - animation.started_at) / animation.duration)
+            offset = self._flight_offset(animation.arrow, board, cell, progress)
+            center = self._arrow_center(animation.arrow, board, cell, offset)
             self._draw_arrow(
                 center,
-                self.animation.arrow.direction,
+                animation.arrow.direction,
                 cell * 0.52,
                 self.theme.success,
                 max(4, cell // 15),

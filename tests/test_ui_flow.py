@@ -32,9 +32,42 @@ class InterfaceFlowTests(unittest.TestCase):
         self.app.page = Page.PLAYING
 
         self.app._try_arrow(arrow, 100)
-        self.app._finish_animation(601)
+        self.app._finish_animations(601)
 
         self.assertEqual(self.app.page, Page.COMPLETE)
+
+    def test_another_arrow_can_be_clicked_while_first_is_flying(self):
+        first = Arrow("first", 0, 0, Direction.UP)
+        second = Arrow("second", 1, 1, Direction.RIGHT)
+        self.app.game = GameState(Level("FAST", 2, 2, (first, second)))
+        self.app.page = Page.PLAYING
+
+        self.app._try_arrow(first, 100)
+        self.app._try_arrow(second, 150)
+
+        self.assertEqual(len(self.app.animations), 2)
+        self.assertNotIn("first", self.app.game.arrows)
+        self.assertNotIn("second", self.app.game.arrows)
+
+    def test_collision_locks_only_that_arrow(self):
+        blocked = Arrow("blocked", 1, 0, Direction.RIGHT)
+        free = Arrow("free", 1, 2, Direction.UP)
+        self.app.game = GameState(Level("LOCK", 3, 3, (blocked, free)))
+        self.app.page = Page.PLAYING
+        board, cell = self.app._board_geometry()
+        blocked_center = self.app._arrow_center(blocked, board, cell)
+        free_center = self.app._arrow_center(free, board, cell)
+
+        self.app._handle_click(blocked_center, 100)
+        self.app._handle_click(blocked_center, 150)
+
+        self.assertEqual(self.app.game.mistakes_remaining, 2)
+        self.assertEqual(len(self.app.animations), 1)
+
+        self.app._handle_click(free_center, 200)
+
+        self.assertNotIn("free", self.app.game.arrows)
+        self.assertEqual(len(self.app.animations), 2)
 
     def test_restart_button_restores_removed_arrow(self):
         self.app._start_level(0)
@@ -53,4 +86,3 @@ class InterfaceFlowTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
