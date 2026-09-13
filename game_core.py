@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from functools import lru_cache
 from typing import Iterable
 
 
@@ -168,22 +167,14 @@ class GameState:
 
 
 def solve_level(level: Level) -> tuple[str, ...] | None:
-    """Find one mistake-free solution, used to validate hand-made levels."""
-
-    by_id = {arrow.id: arrow for arrow in level.arrows}
-    initial = frozenset(by_id)
-
-    @lru_cache(maxsize=None)
-    def search(remaining: frozenset[str]) -> tuple[str, ...] | None:
-        if not remaining:
-            return ()
-        current = tuple(by_id[arrow_id] for arrow_id in sorted(remaining))
-        for arrow_id in sorted(remaining):
-            if first_blocker(by_id[arrow_id], current) is None:
-                tail = search(remaining - {arrow_id})
-                if tail is not None:
-                    return (arrow_id, *tail)
-        return None
-
-    return search(initial)
-
+    """Deleting a free arrow cannot create blockers, so backtracking is unnecessary."""
+    remaining = list(level.arrows)
+    solution: list[str] = []
+    while remaining:
+        free = [a for a in remaining if first_blocker(a, remaining) is None]
+        if not free:
+            return None
+        free_ids = {a.id for a in free}
+        solution.extend(a.id for a in free)
+        remaining = [a for a in remaining if a.id not in free_ids]
+    return tuple(solution)

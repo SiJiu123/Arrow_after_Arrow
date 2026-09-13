@@ -1,4 +1,4 @@
-"""Hand-designed, deterministic and solver-checked levels."""
+"""Fixed solver-checked levels. Later layouts were selected by an AI-assisted search."""
 
 from __future__ import annotations
 
@@ -36,21 +36,21 @@ LEVELS: tuple[Level, ...] = (
         6,
         _arrows(
             [
-                (0, 1, Direction.UP),
-                (0, 4, Direction.UP),
+                (0, 1, Direction.RIGHT),
+                (0, 4, Direction.RIGHT),
                 (1, 1, Direction.UP),
-                (1, 3, Direction.RIGHT),
+                (1, 3, Direction.LEFT),
                 (1, 5, Direction.RIGHT),
-                (2, 0, Direction.LEFT),
-                (2, 2, Direction.LEFT),
-                (2, 4, Direction.UP),
-                (3, 1, Direction.DOWN),
-                (3, 3, Direction.RIGHT),
-                (3, 5, Direction.RIGHT),
-                (4, 2, Direction.LEFT),
+                (2, 0, Direction.DOWN),
+                (2, 2, Direction.DOWN),
+                (2, 4, Direction.DOWN),
+                (3, 1, Direction.UP),
+                (3, 3, Direction.LEFT),
+                (3, 5, Direction.UP),
+                (4, 2, Direction.RIGHT),
                 (4, 4, Direction.DOWN),
-                (5, 1, Direction.DOWN),
-                (5, 4, Direction.DOWN),
+                (5, 1, Direction.UP),
+                (5, 4, Direction.RIGHT),
             ]
         ),
     ),
@@ -60,28 +60,28 @@ LEVELS: tuple[Level, ...] = (
         7,
         _arrows(
             [
-                (0, 0, Direction.UP),
-                (0, 3, Direction.UP),
-                (0, 6, Direction.RIGHT),
-                (1, 1, Direction.LEFT),
-                (1, 3, Direction.UP),
-                (1, 5, Direction.RIGHT),
+                (0, 0, Direction.RIGHT),
+                (0, 3, Direction.RIGHT),
+                (0, 6, Direction.DOWN),
+                (1, 1, Direction.DOWN),
+                (1, 3, Direction.LEFT),
+                (1, 5, Direction.LEFT),
                 (2, 0, Direction.LEFT),
-                (2, 2, Direction.LEFT),
-                (2, 4, Direction.UP),
-                (2, 6, Direction.RIGHT),
-                (3, 1, Direction.DOWN),
+                (2, 2, Direction.DOWN),
+                (2, 4, Direction.RIGHT),
+                (2, 6, Direction.DOWN),
+                (3, 1, Direction.RIGHT),
                 (3, 3, Direction.RIGHT),
-                (3, 5, Direction.UP),
-                (4, 0, Direction.LEFT),
-                (4, 2, Direction.DOWN),
-                (4, 4, Direction.RIGHT),
-                (4, 6, Direction.RIGHT),
-                (5, 1, Direction.LEFT),
-                (5, 3, Direction.DOWN),
-                (5, 5, Direction.RIGHT),
-                (6, 0, Direction.LEFT),
-                (6, 3, Direction.DOWN),
+                (3, 5, Direction.DOWN),
+                (4, 0, Direction.RIGHT),
+                (4, 2, Direction.RIGHT),
+                (4, 4, Direction.UP),
+                (4, 6, Direction.DOWN),
+                (5, 1, Direction.DOWN),
+                (5, 3, Direction.LEFT),
+                (5, 5, Direction.LEFT),
+                (6, 0, Direction.UP),
+                (6, 3, Direction.RIGHT),
                 (6, 6, Direction.DOWN),
             ]
         ),
@@ -106,4 +106,3 @@ def validate_levels() -> dict[str, tuple[str, ...]]:
 
 
 SOLUTIONS = validate_levels()
-
