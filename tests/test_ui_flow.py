@@ -6,9 +6,9 @@ os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
 import pygame
 
-from app import Animation, ArrowGame, Page
+from app import ArrowGame, Page
 from game_core import Arrow, Direction, GameState, Level, MoveResult, RoundStatus
-from levels import LEVELS
+from levels import LEVELS, SOLUTIONS
 
 
 class InterfaceFlowTests(unittest.TestCase):
@@ -17,6 +17,10 @@ class InterfaceFlowTests(unittest.TestCase):
 
     def tearDown(self):
         pygame.quit()
+
+    def click_arrow(self, arrow, now):
+        board, cell = self.app._board_geometry()
+        self.app._handle_click(self.app._arrow_center(arrow, board, cell), now)
 
     def test_start_button_opens_first_level(self):
         self.app._handle_click(self.app._start_button().rect.center, 0)
@@ -42,12 +46,52 @@ class InterfaceFlowTests(unittest.TestCase):
         self.app.game = GameState(Level("FAST", 2, 2, (first, second)))
         self.app.page = Page.PLAYING
 
-        self.app._try_arrow(first, 100)
-        self.app._try_arrow(second, 150)
+        self.click_arrow(first, 100)
+        self.click_arrow(second, 150)
 
         self.assertEqual(len(self.app.animations), 2)
+
         self.assertNotIn("first", self.app.game.arrows)
         self.assertNotIn("second", self.app.game.arrows)
+
+    def test_full_campaign_via_mouse_coordinates_and_next_buttons(self):
+        self.app._handle_click(self.app._start_button().rect.center, 0)
+        now = 100
+        for index, level in enumerate(LEVELS):
+            self.assertEqual(self.app.level_index, index)
+            for arrow_id in SOLUTIONS[level.name]:
+                self.click_arrow(self.app.game.arrows[arrow_id], now)
+                self.app.draw(now)
+                now += 20
+            self.app._finish_animations(now + 501)
+            expected = Page.COMPLETE if index == len(LEVELS) - 1 else Page.LEVEL_WON
+            self.assertEqual(self.app.page, expected)
+            self.assertEqual(self.app.game.mistakes_remaining, 3)
+            if expected is Page.LEVEL_WON:
+                self.app._handle_click(self.app._dialog_primary_button().rect.center, now + 502)
+            now += 600
+
+    def test_failure_dialog_retry_and_animation_restart(self):
+        self.app._start_level(0)
+        blocked = next(a for a in self.app.game.arrows.values()
+                       if self.app.game.blocker_for(a.id) is not None)
+        for now in (100, 600, 1100):
+            self.click_arrow(blocked, now)
+            self.app.draw(now + 200)
+            self.app._finish_animations(now + 431)
+        self.assertEqual(self.app.page, Page.FAILED)
+        self.app._handle_click(self.app._dialog_primary_button().rect.center, 1600)
+        self.assertEqual(self.app.page, Page.PLAYING)
+        self.assertEqual(self.app.game.mistakes_remaining, 3)
+        free = next(a for a in self.app.game.arrows.values()
+                    if self.app.game.blocker_for(a.id) is None)
+        self.click_arrow(free, 1700)
+        self.assertTrue(self.app.animations)
+        self.app._handle_click(self.app._restart_button().rect.center, 1710)
+        self.app._finish_animations(2300)
+        self.assertFalse(self.app.animations)
+        self.assertEqual(len(self.app.game.arrows), len(LEVELS[0].arrows))
+        self.assertEqual(self.app.page, Page.PLAYING)
 
     def test_collision_locks_only_that_arrow(self):
         blocked = Arrow("blocked", 1, 0, Direction.RIGHT)
@@ -68,6 +112,12 @@ class InterfaceFlowTests(unittest.TestCase):
 
         self.assertNotIn("free", self.app.game.arrows)
         self.assertEqual(len(self.app.animations), 2)
+
+        # Retry immediately after the blocker leaves, before the 430ms shake ends.
+        self.click_arrow(blocked, 210)
+        self.assertNotIn('blocked', self.app.game.arrows)
+        self.assertEqual(self.app.game.mistakes_remaining, 2)
+        self.assertTrue(all(a.kind is MoveResult.REMOVED for a in self.app.animations))
 
     def test_restart_button_restores_removed_arrow(self):
         self.app._start_level(0)

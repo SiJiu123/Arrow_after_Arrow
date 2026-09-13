@@ -122,7 +122,15 @@ class ArrowGame:
                 and animation.arrow.id == arrow.id
                 for animation in self.animations
             )
-            if arrow is not None and not collision_running:
+            if arrow is not None:
+                if collision_running:
+                    if self.game.blocker_for(arrow.id) is not None:
+                        return
+                    # The blocker may have flown away during this feedback.
+                    self.animations = [
+                        animation for animation in self.animations
+                        if animation.arrow.id != arrow.id
+                    ]
                 self._try_arrow(arrow, now)
             return
 
@@ -349,6 +357,8 @@ class ArrowGame:
             if animation.kind is not MoveResult.BLOCKED or animation.blocker is None:
                 continue
             blocker = animation.blocker
+            if blocker.id not in self.game.arrows:
+                continue
             blocker_rect = pygame.Rect(
                 board.left + blocker.col * cell + 5,
                 board.top + blocker.row * cell + 5,
