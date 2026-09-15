@@ -46,8 +46,8 @@ python app.py
 python -m unittest discover -s tests -v
 ```
 
-覆盖路径判断、失误与重开、关卡求解、连续点击及页面切换。详见[测试报告](docs/TEST_REPORT.md)。
+测试覆盖路径判断、失误与重开、关卡求解、连续点击及页面切换。
 
 ## 开发说明
 
-本项目使用 ChatGPT / Codex 辅助开发，界面与箭头均由程序绘制，未使用原商业游戏素材。实现思路与协作过程见[作业博客](docs/BLOG_DRAFT.md)。
+本项目使用 ChatGPT / Codex 辅助开发，界面与箭头均由程序绘制，未使用原商业游戏素材。

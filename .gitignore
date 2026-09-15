@@ -7,3 +7,6 @@ build/
 *.spec
 assets/videos/contact-sheet.jpg
 assets/videos/gif-check.jpg
+docs/BLOG_DRAFT.md
+docs/DEVELOPMENT_LOG.md
+docs/TEST_REPORT.md
