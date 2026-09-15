@@ -2,6 +2,12 @@
 
 使用 Python 和 Pygame 编写的单格箭头点击解谜游戏。玩家需要判断箭头前方是否还有其他箭头，并按合适的顺序让所有箭头飞出棋盘。
 
+## 实机演示
+
+以下 GIF 来自本人录制的游戏过程，展示三关操作与页面切换。
+
+![三关游戏演示](assets/videos/game-demo-full.gif)
+
 ## 功能
 
 - 开始、游戏、通关和失败界面
@@ -24,6 +30,13 @@
 
 ## 安装与运行
 
+下载仓库 ZIP 并解压，或使用 Git 获取项目：
+
+```bash
+git clone https://github.com/SiJiu123/Arrow_after_Arrow.git
+cd Arrow_after_Arrow
+```
+
 在项目目录打开终端，依次执行：
 
 ```bash
@@ -43,9 +56,10 @@ python app.py
 
 ## 游戏截图
 
-截图存放在 `assets/screenshots/`，包括开始界面、游戏界面和全部通关界面。
+<details>
+<summary>展开查看开始、游戏、通关与失败界面</summary>
 
-这些是程序生成的演示截图；通关与失败示例通过点击处理流程生成，不代表学生人工试玩记录。
+以下为程序生成的界面演示截图。
 
 ![开始界面](assets/screenshots/start-screen.png)
 
@@ -54,6 +68,8 @@ python app.py
 ![全部通关界面](assets/screenshots/complete-screen.png)
 
 ![失败界面](assets/screenshots/failed-screen.png)
+
+</details>
 
 ## 测试
 
@@ -64,12 +80,14 @@ python -m unittest discover -s tests -v
 测试覆盖作业要求中的 T01—T06、四方向路径判断、最近阻挡物识别，以及三个关卡的完整求解。
 
 保存带时间戳的测试结果与各关通关坐标：`python scripts/check_project.py`。
-结果见 [测试说明](docs/TEST_REPORT.md) 和 [机器生成证据](docs/evidence/verification.json)。
+结果见 [测试报告](docs/TEST_REPORT.md) 和 [自动验证结果](docs/evidence/verification.json)。
 
 ## 开发与作业材料
 
-- [本轮AIGC优化记录与实测计时](docs/OPTIMIZATION_LOG.md)
-- [博客草稿](docs/BLOG_DRAFT.md)：保留课程链接、学号、个人心得等待本人补充。
+- [作业博客](docs/BLOG_DRAFT.md)：项目介绍、实现思路、AIGC 使用、测试、PSP 与心得。
+- [AIGC 开发记录](docs/DEVELOPMENT_LOG.md)
+- [优化记录](docs/OPTIMIZATION_LOG.md)
+- [测试报告](docs/TEST_REPORT.md)
 - [作业检查清单](docs/SUBMISSION_CHECKLIST.md)
 
 ## 项目结构
@@ -79,7 +97,9 @@ app.py                    Pygame 界面、点击与动画
 game_core.py              路径检测和游戏状态
 levels.py                 三个固定关卡及可解性检查
 theme.py                  集中的配色和尺寸配置
-tests/test_game_core.py   自动化测试
+tests/                    规则、求解器与界面流程测试
+assets/screenshots/       界面截图
+assets/videos/            实机演示 GIF
 docs/DEVELOPMENT_LOG.md   AIGC 协作和阶段计时记录
 docs/DESIGN.md            界面与交互设计说明
 ```
