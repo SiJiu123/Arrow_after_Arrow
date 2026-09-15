@@ -50,4 +50,4 @@ python -m unittest discover -s tests -v
 
 ## 开发说明
 
-本项目使用 ChatGPT / Codex 辅助开发，界面与箭头均由程序绘制，未使用原商业游戏素材。实现思路与协作过程见[作业博客](docs/BLOG_DRAFT.md)。
+本项目使用 ChatGPT / Codex 辅助开发，界面与箭头均由程序绘制，未使用原商业游戏素材。协作过程见[AIGC 开发记录](docs/DEVELOPMENT_LOG.md)。
